@@ -24,7 +24,6 @@
           <div class="amenitTitle font-weight-bold">Availability</div>
           <div class="d-flex">
             <calendar/>
-            <calendar/>
           </div>
         </div>
       </div>

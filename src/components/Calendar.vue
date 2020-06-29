@@ -15,43 +15,50 @@
           <div class="nextTri"></div>
         </div>
       </div>
-      <div class="calendar">
-        <div class="weekDay">
-          <div>日</div>
-          <div>一</div>
-          <div>二</div>
-          <div>三</div>
-          <div>四</div>
-          <div>五</div>
-          <div>六</div>
+      <div class="row">
+        <div class="calendar col">
+          <div class="weekDay">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="week" v-for="i in 6" :key="i">
+            <div class="day" v-for="(j,idx) in 7" :key="idx" :class="{pastDay:calendarMonth[(i-1)*7+j-1].month === today.month && calendarMonth[(i-1)*7+j-1].date < today.date || calendar.month < today.month || calendar.year < today.year}">
+              <div class="date" @click.prevent="selectDate($event,calendarMonth[(i-1)*7+j-1])">
+                <div class="datePick" :class="{ today:calendarMonth[(i-1)*7+j-1].year === today.year && calendarMonth[(i-1)*7+j-1].month === today.month && calendarMonth[(i-1)*7+j-1].date === today.date ,other:calendarMonth[(i-1)*7+j-1].month !== calendar.month ,pastDay:calendarMonth[(i-1)*7+j-1].month === today.month && calendarMonth[(i-1)*7+j-1].date < today.date || calendar.month < today.month || calendar.year < today.year ,weekend:j==7||j==1 ,selected: visibility==`${calendarMonth[(i-1)*7+j-1].year}${calendarMonth[(i-1)*7+j-1].month}${calendarMonth[(i-1)*7+j-1].date}` }"   @click="visibility = `${calendarMonth[(i-1)*7+j-1].year}${calendarMonth[(i-1)*7+j-1].month}${calendarMonth[(i-1)*7+j-1].date}`">
+                  <div class="solar">{{calendarMonth[(i-1)*7+j-1].date}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="week" v-for="i in 6" :key="i">
-          <div
-            class="day"
-            v-for="(j,idx) in 7"
-            :key="idx"
-            :class="{pastDay:calendarMonth[(i-1)*7+j-1].month === today.month && calendarMonth[(i-1)*7+j-1].date < today.date || calendar.month < today.month || calendar.year < today.year
-}"
-          >
-            <div class="date" @click.prevent="selectDate($event,calendarMonth[(i-1)*7+j-1])">
-              <div
-                class="datePick"
-                :class="{
-              today:calendarMonth[(i-1)*7+j-1].year === today.year && calendarMonth[(i-1)*7+j-1].month === today.month && calendarMonth[(i-1)*7+j-1].date === today.date
-              ,other:calendarMonth[(i-1)*7+j-1].month !== calendar.month
-              ,pastDay:calendarMonth[(i-1)*7+j-1].month === today.month && calendarMonth[(i-1)*7+j-1].date < today.date || calendar.month < today.month || calendar.year < today.year
-              ,weekend:j==7||j==1
-              ,selected: visibility==`${calendarMonth[(i-1)*7+j-1].year}${calendarMonth[(i-1)*7+j-1].month}${calendarMonth[(i-1)*7+j-1].date}`
-              }"
-                @click="visibility = `${calendarMonth[(i-1)*7+j-1].year}${calendarMonth[(i-1)*7+j-1].month}${calendarMonth[(i-1)*7+j-1].date}`"
-              >
-                <div class="solar">{{calendarMonth[(i-1)*7+j-1].date}}</div>
+        <div class="calendar col">
+          <div class="weekDay">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="week" v-for="i in 6" :key="i">
+            <div class="day" v-for="(j,idx) in 7" :key="idx" :class="today.month < nextCalendarMonth[(i-1)*7+j-1].month?'':'pastDay'">
+              <div class="date" @click.prevent="selectDate($event,nextCalendarMonth[(i-1)*7+j-1])">
+                <div class="datePick" :class="nextCalendarMonth[(i-1)*7+j-1].month>nextCalendarFirstDay.month?'other':''" @click="visibility = `${nextCalendarMonth[(i-1)*7+j-1].year}${nextCalendarMonth[(i-1)*7+j-1].month}${nextCalendarMonth[(i-1)*7+j-1].date}`">
+                  <div class="solar">{{nextCalendarMonth[(i-1)*7+j-1].date}}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    {{nextCalendarMonth}}
   </div>
 </template>
 
@@ -108,9 +115,6 @@ export default {
         this.calendar.month = month
       }
     },
-    convertLunar (val) {
-      return this.solar2lunar(val)
-    },
     selectDate(e,date){
       this.closeCalendar()   
       this.calendar.year = date.year
@@ -135,6 +139,16 @@ export default {
         day:vm.chiday[date.getDay()],
       }
     },
+    nextCalendarFirstDay(){ 
+      let vm =this;
+      const mDate = new Date(this.calendar.year,this.calendar.month+1,1)
+      return {
+        year:mDate.getFullYear(),
+        month:mDate.getMonth(),
+        date:mDate.getDate(),
+        day:vm.chiday[mDate.getDay()],
+      }
+    },
     calendarMonth(){
       const data = []
       let date
@@ -149,22 +163,13 @@ export default {
       }
       return data
     },
-    nextCalendarFirstDay(){ 
-      let vm =this;
-      const mDate = new Date(this.calendar.year,this.calendar.month+1,1)
-      const date = new Date(this.calendar.year,this.calendar.month +1 ,1 - mDate.getDay())
-      return {
-        year:date.getFullYear(),
-        month:date.getMonth(),
-        date:date.getDate(),
-        day:vm.chiday[date.getDay()],
-      }
-    },
     nextCalendarMonth(){
       const data = []
+      let vm = this
+      const mDate = new Date(vm.calendar.year,vm.calendar.month+1,1)
       let date
       for(let i=0;i<42;i++){
-        date = new Date(this.nextcalendarFirstDay.year,this.nextcalendarFirstDay.month,this.nextcalendarFirstDay.date + i)
+        date = new Date(vm.calendar.year,vm.calendar.month +1 ,1 - mDate.getDay()+i)
         data.push({
           year:date.getFullYear(),
           month:date.getMonth(),
