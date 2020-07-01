@@ -71,13 +71,13 @@ $colors: map-merge(
 );
 
 $primary:       #569DC3 !default;
-$secondary:     $indigo !default;
+$secondary:     #748290 !default;
 $success:       $green !default;
 $info:          $cyan !default;
 $warning:       $yellow !default;
 $danger:        $red !default;
-$light:         $gray-100 !default;
-$dark:          $gray-800 !default;
+$light:         #2D3643!default;
+$dark:          #2D3643 !default;
 $mute:          #E3E6E9 !default;
 
 $theme-colors: () !default;
