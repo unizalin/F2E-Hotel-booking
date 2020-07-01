@@ -58,7 +58,6 @@
         </div>
       </div>
     </div>
-    {{nextCalendarMonth}}
   </div>
 </template>
 
@@ -82,6 +81,7 @@ export default {
         date: '',
         day:''
       },
+      dateArr:[]
     };
   },
   mounted(){
@@ -116,15 +116,41 @@ export default {
       }
     },
     selectDate(e,date){
-      this.closeCalendar()   
-      this.calendar.year = date.year
-      this.calendar.month = date.month // 0~11
-      this.calendar.date = date.date 
-      this.calendar.day = date.day 
-      // alert(`你選到的日期為 ${date.year}${date.month+1}月 ${date.date}日 星期 ${date.day}`)
+      // this.calendar.year = date.year
+      // this.calendar.month = date.month // 0~11
+      // this.calendar.date = date.date 
+      // this.calendar.day = date.day 
+      console.log(e)
+      e.target.classList.add('selected')
+      let vm = this
+      if(vm.dateArr.length<2){
+        console.log('data<2')
+        
+        vm.dateArr.push({
+          year: date.year,
+          month: date.month,
+          date: date.date
+        })
+      }else{
+        vm.dateArr.shift()
+        vm.dateArr.push({
+          year: date.year,
+          month: date.month,
+          date: date.date
+        })
+      }
+      console.log(vm.dateArr)
+      console.log(`你選到的日期為 ${date.year}${date.month+1}月 ${date.date}日 星期 ${date.day}`)
     },
     closeCalendar(){
       // this.setToday()
+    },
+    sortDateRange(start,end){
+      let d = new Daye()
+      let startDate = d.setUTCFullYear(start.year, start.month - 1, start.date);
+      let endDate = d.setUTCFullYear(end.year, end.month - 1, end.date);
+      
+
     }
   },
   computed:{
@@ -179,6 +205,9 @@ export default {
       }
       return data
     },
+    dateRange(){
+
+    }
   },
 }
 </script>
@@ -257,13 +286,13 @@ $Primary: #ffe99d;
 .today {
   width: 50px;
   background-color: #ffedcf;
-  border-radius: 50%;
   position: relative;
 }
 .selected {
   width: 50px;
-  border-radius: 50%;
-  border: 1px solid #853737;
+  background-color: #ffedcf;
+  // border-radius: 50%;
+  // border: 1px solid #853737;
 }
 
 .pastDay {
