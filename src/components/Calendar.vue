@@ -81,7 +81,8 @@ export default {
         date: '',
         day:''
       },
-      dateArr:[]
+      dateArr:[],
+      dateRange:[]
     };
   },
   mounted(){
@@ -120,11 +121,10 @@ export default {
       // this.calendar.month = date.month // 0~11
       // this.calendar.date = date.date 
       // this.calendar.day = date.day 
-      console.log(e)
-      e.target.classList.add('selected')
+      // console.log(e)
+      // e.target.classList.add('selected')
       let vm = this
       if(vm.dateArr.length<2){
-        console.log('data<2')
         
         vm.dateArr.push({
           year: date.year,
@@ -138,20 +138,50 @@ export default {
           month: date.month,
           date: date.date
         })
+        // sortDateRange(vm.dateArr[0],vm.dateArr[1])
+        vm.getAll()
       }
-      console.log(vm.dateArr)
-      console.log(`你選到的日期為 ${date.year}${date.month+1}月 ${date.date}日 星期 ${date.day}`)
+      // console.log(`你選到的日期為 ${date.year}${date.month+1}月 ${date.date}日 星期 ${date.day}`)
     },
-    closeCalendar(){
-      // this.setToday()
-    },
-    sortDateRange(start,end){
-      let d = new Daye()
-      let startDate = d.setUTCFullYear(start.year, start.month - 1, start.date);
-      let endDate = d.setUTCFullYear(end.year, end.month - 1, end.date);
-      
-
-    }
+    getAll() {
+        console.log('s')
+        let vm = this;
+        console.log(vm.dateArr[0].year)
+        let arr = []
+        let db = new Date()
+        db.setUTCFullYear(vm.dateArr[0].year,vm.dateArr[0].month-1,vm.dateArr[0].date)
+        var de = new Date()
+        de.setUTCFullYear(vm.dateArr[1].year,vm.dateArr[1].month-1,vm.dateArr[1].date)
+        var unixDb = db.getTime() - 24*60*60*1000
+        var unixDe = de.getTime() - 24*60*60*1000
+        console.log(unixDb,unixDe)
+        if( unixDb < unixDe){
+          for(var k = unixDb;k<=unixDe;) {
+              k = k +24 *60 *60 *1000;
+            vm.dateRange.push( 
+              {
+                year: new Date(parseInt(k)).getFullYear(),
+                month: new Date(parseInt(k)).getMonth(),
+                date: new Date(parseInt(k)).getDate(),
+                day: new Date(parseInt(k)).getDay(),
+              })
+          }
+          console.log(arr) 
+        } else {
+          for(var k = unixDe;k<=unixDb;) {
+              k = k +24 *60 *60 *1000;
+              vm.dateRange.push( 
+              {
+                year: new Date(parseInt(k)).getFullYear(),
+                month: new Date(parseInt(k)).getMonth(),
+                date: new Date(parseInt(k)).getDate(),
+                day: new Date(parseInt(k)).getDay(),
+              })
+          }
+          console.log(arr) 
+        }
+        return arr
+      }
   },
   computed:{
     calendarFirstDay(){ 
@@ -206,8 +236,55 @@ export default {
       return data
     },
     dateRange(){
-
-    }
+      let vm = this;
+      let d = new Date()
+      let startTime = new Date(vm.dateArr[0].year,vm.dateArr[0].momth -1 ,vm.dateArr[0].date)
+      let endTime = new Date(vm.dateArr[0].year,vm.dateArr[0].momth -1 ,vm.dateArr[0].date)
+      if(startTime>endTime){
+        while((endTime.getTime()-startTime.getTime())>=0){
+          var year = startTime.getFullYear();
+          var month = startTime.getMonth().toString().length==1?"0"+startTime.getMonth().toString():startTime.getMonth();
+          var day = startTime.getDate().toString().length==1?"0"+startTime.getDate():startTime.getDate();
+          console.log(year+"-"+month+"-"+day);
+          startTime.setDate(startTime.getDate()+1);
+        }
+      }
+    },
+    // getAll() {
+    //     let arr = []
+    //     // let ab = begin.split("-")
+    //     // let ae = end.split("-")
+    //     let db = new Date()
+    //     db.setUTCFullYear(vm.dateArr[0].year,vm.dateArr[0].month-1,vm.dateArr[0].date)
+    //     var de = new Date()
+    //     de.setUTCFullYear(vm.dateArr[1].year,vm.dateArr[1].month-1,vm.dateArr[1].date)
+    //     var unixDb = db.getTime() - 24*60*60*1000
+    //     var unixDe = de.getTime() - 24*60*60*1000
+    //     if( unixDb < unixDe){
+    //       for(var k = unixDb;k<=unixDe;) {
+    //           k = k +24 *60 *60 *1000;
+    //         arr.push( 
+    //           {
+    //             year: new Date(parseInt(k)).getFullYear(),
+    //             month: new Date(parseInt(k)).getMonth(),
+    //             date: new Date(parseInt(k)).getDate(),
+    //             day: new Date(parseInt(k)).getDay(),
+    //           })
+    //       }
+    //     } else {
+    //       for(var k = unixDe;k<=unixDb;) {
+    //           k = k +24 *60 *60 *1000;
+    //           arr.push( 
+    //           {
+    //             year: new Date(parseInt(k)).getFullYear(),
+    //             month: new Date(parseInt(k)).getMonth(),
+    //             date: new Date(parseInt(k)).getDate(),
+    //             day: new Date(parseInt(k)).getDay(),
+    //           })
+    //       }
+    //     }
+    //     return arr
+    //   }
   },
 }
 </script>
