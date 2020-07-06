@@ -30,7 +30,7 @@
             <div class="day" v-for="(j,idx) in 7" :key="idx" :class="{pastDay:calendarMonth[(i-1)*7+j-1].month === today.month && calendarMonth[(i-1)*7+j-1].date < today.date || calendar.month < today.month || calendar.year < today.year}">
               <div class="date" @click.prevent="selectDate($event,calendarMonth[(i-1)*7+j-1])">
                 <div class="datePick" :class="{ today:calendarMonth[(i-1)*7+j-1].year === today.year && calendarMonth[(i-1)*7+j-1].month === today.month && calendarMonth[(i-1)*7+j-1].date === today.date ,other:calendarMonth[(i-1)*7+j-1].month !== calendar.month ,pastDay:calendarMonth[(i-1)*7+j-1].month === today.month && calendarMonth[(i-1)*7+j-1].date < today.date || calendar.month < today.month || calendar.year < today.year ,weekend:j==7||j==1 ,selected: visibility==`${calendarMonth[(i-1)*7+j-1].year}${calendarMonth[(i-1)*7+j-1].month}${calendarMonth[(i-1)*7+j-1].date}` }"   @click="visibility = `${calendarMonth[(i-1)*7+j-1].year}${calendarMonth[(i-1)*7+j-1].month}${calendarMonth[(i-1)*7+j-1].date}`">
-                  <div class="solar">{{calendarMonth[(i-1)*7+j-1].date}}</div>
+                  <div class="solar">{{calendarMonth[(i-1)*7+j-1].date}}{{calendarMonth[(i-1)*7+j-1].selected}}</div>
                 </div>
               </div>
             </div>
@@ -117,12 +117,6 @@ export default {
       }
     },
     selectDate(e,date){
-      // this.calendar.year = date.year
-      // this.calendar.month = date.month // 0~11
-      // this.calendar.date = date.date 
-      // this.calendar.day = date.day 
-      // console.log(e)
-      // e.target.classList.add('selected')
       let vm = this
       if(vm.dateArr.length<2){
         
@@ -139,19 +133,19 @@ export default {
           date: date.date
         })
         // sortDateRange(vm.dateArr[0],vm.dateArr[1])
-        vm.getAll()
       }
+        vm.getAll()
       // console.log(`你選到的日期為 ${date.year}${date.month+1}月 ${date.date}日 星期 ${date.day}`)
     },
     getAll() {
         console.log('s')
         let vm = this;
         console.log(vm.dateArr[0].year)
-        let arr = []
+        vm.dateRange = []
         let db = new Date()
-        db.setUTCFullYear(vm.dateArr[0].year,vm.dateArr[0].month-1,vm.dateArr[0].date)
+        db.setUTCFullYear(vm.dateArr[0].year,vm.dateArr[0].month,vm.dateArr[0].date)
         var de = new Date()
-        de.setUTCFullYear(vm.dateArr[1].year,vm.dateArr[1].month-1,vm.dateArr[1].date)
+        de.setUTCFullYear(vm.dateArr[1].year,vm.dateArr[1].month,vm.dateArr[1].date)
         var unixDb = db.getTime() - 24*60*60*1000
         var unixDe = de.getTime() - 24*60*60*1000
         console.log(unixDb,unixDe)
@@ -165,8 +159,15 @@ export default {
                 date: new Date(parseInt(k)).getDate(),
                 day: new Date(parseInt(k)).getDay(),
               })
+            vm.calendarMonth.forEach(item=>{
+              console.log('calendar',item)
+              if(item.year==new Date(parseInt(k)).getFullYear() &&  item.month==new Date(parseInt(k)).getMonth() && item.date ==new Date(parseInt(k)).getDate() && item.day ==new Date(parseInt(k)).getDay()){
+                item.selected = true
+              }else{
+                item.selected = false
+              }
+            })
           }
-          console.log(arr) 
         } else {
           for(var k = unixDe;k<=unixDb;) {
               k = k +24 *60 *60 *1000;
@@ -177,10 +178,20 @@ export default {
                 date: new Date(parseInt(k)).getDate(),
                 day: new Date(parseInt(k)).getDay(),
               })
+              console.log('tw',{
+                year: new Date(parseInt(k)).getFullYear(),
+                month: new Date(parseInt(k)).getMonth(),
+                date: new Date(parseInt(k)).getDate(),
+                day: new Date(parseInt(k)).getDay(),
+              })
+              vm.calendarMonth.forEach(item=>{
+              console.log('calendar',item)
+              if(item.year==new Date(parseInt(k)).getFullYear() &&  item.month==new Date(parseInt(k)).getMonth() && item.date ==new Date(parseInt(k)).getDate() && item.day ==new Date(parseInt(k)).getDay()){
+                item.selected = true
+              }
+            })
           }
-          console.log(arr) 
         }
-        return arr
       }
   },
   computed:{
@@ -214,7 +225,8 @@ export default {
           year:date.getFullYear(),
           month:date.getMonth(),
           date:date.getDate(),
-          day:date.getDay()
+          day:date.getDay(),
+          selected: false
         })
       }
       return data
@@ -230,26 +242,27 @@ export default {
           year:date.getFullYear(),
           month:date.getMonth(),
           date:date.getDate(),
-          day:date.getDay()
+          day:date.getDay(),
+          selected: false
         })
       }
       return data
     },
-    dateRange(){
-      let vm = this;
-      let d = new Date()
-      let startTime = new Date(vm.dateArr[0].year,vm.dateArr[0].momth -1 ,vm.dateArr[0].date)
-      let endTime = new Date(vm.dateArr[0].year,vm.dateArr[0].momth -1 ,vm.dateArr[0].date)
-      if(startTime>endTime){
-        while((endTime.getTime()-startTime.getTime())>=0){
-          var year = startTime.getFullYear();
-          var month = startTime.getMonth().toString().length==1?"0"+startTime.getMonth().toString():startTime.getMonth();
-          var day = startTime.getDate().toString().length==1?"0"+startTime.getDate():startTime.getDate();
-          console.log(year+"-"+month+"-"+day);
-          startTime.setDate(startTime.getDate()+1);
-        }
-      }
-    },
+    // dateRange(){
+    //   let vm = this;
+    //   let d = new Date()
+    //   let startTime = new Date(vm.dateArr[0].year,vm.dateArr[0].momth -1 ,vm.dateArr[0].date)
+    //   let endTime = new Date(vm.dateArr[0].year,vm.dateArr[0].momth -1 ,vm.dateArr[0].date)
+    //   if(startTime>endTime){
+    //     while((endTime.getTime()-startTime.getTime())>=0){
+    //       var year = startTime.getFullYear();
+    //       var month = startTime.getMonth().toString().length==1?"0"+startTime.getMonth().toString():startTime.getMonth();
+    //       var day = startTime.getDate().toString().length==1?"0"+startTime.getDate():startTime.getDate();
+    //       console.log(year+"-"+month+"-"+day);
+    //       startTime.setDate(startTime.getDate()+1);
+    //     }
+    //   }
+    // },
     // getAll() {
     //     let arr = []
     //     // let ab = begin.split("-")
